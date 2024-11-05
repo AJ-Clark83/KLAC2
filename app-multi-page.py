@@ -5,12 +5,16 @@ Created on Sat Nov  2 14:39:52 2024
 @author: andrew.clark
 """
 
+from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 import pandas as pd
 import requests
 
 # Set page configuration to wide mode
 st.set_page_config(layout="wide")
+
+# Set the refresh interval in milliseconds
+refresh_interval_ms = 20000  # 30 seconds
 
 # Load the data from Google Sheets
 url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRBXEVC7gCD1n1JteAdB0I1JUbVCfH-vA6s8uJ1CHIJ4ALWF4dCh1NJk6oahJQlOGixibw3WlY21aIi/pub?gid=0&single=true&output=csv'
@@ -108,46 +112,47 @@ if page == "Program":
         st.markdown("<hr style='border-top: 2px solid #082251; margin: 20px 0;'>", unsafe_allow_html=True)
 
 elif page == "Display":
-    
+    # Automatically refresh the page every 30 seconds
+    st_autorefresh(interval=refresh_interval_ms, key="display_autorefresh")
+
     filtered_df = df[['Group', 'Event', 'Marshalling Area', 'Status']]
     
     # Define custom CSS for the table with Roboto font, left-aligned headers, and alternating row colors
     st.markdown(
-         """
-         <style>
-         .custom-table {
-             font-family: 'Roboto', sans-serif;
-             font-size: 15px;
-             font-weight: bold;
-             color: #FFFFFF;
-             background-color: #082251;
-             border-collapse: collapse;
-             width: 100%;
-             margin-top: -60px;
-         }
-         .custom-table th, .custom-table td {
-             padding: 5px;
-             border: 1px solid #A8CE3B;
-         }
-         .custom-table th {
-             background-color: #A8CE3B;
-             color: #082251;
-             text-align: left;  /* Left-align column headings */
-         }
-         .custom-table tr:nth-child(even) td {  /* Apply background to even rows */
-             background-color: #0A2E47;  /* Slightly darker shade */
-         }
-         </style>
-         """,
-         unsafe_allow_html=True
-     )
+     """
+     <style>
+     .custom-table {
+         font-family: 'Roboto Condensed','Roboto', sans-serif;
+         font-size: 15px;
+         font-weight: bold;
+         color: #082251;
+         background-color: #FFFFFF;
+         border-collapse: collapse;
+         width: 100%;
+         margin-top: -80px;
+     }
+     .custom-table th, .custom-table td {
+         padding: 3px;
+         border: 2px solid #e3e3e3;
+     }
+     .custom-table th {
+         background-color: #A8CE3B;
+         color: #082251;
+         font-size: 17px;
+         text-align: left;
+     }
+     .custom-table tr:nth-child(even) td {
+         background-color: #F3F3F3;
+     }
+     </style>
+     """,
+     unsafe_allow_html=True
+ )
     
     # Convert DataFrame to HTML
     table_html = filtered_df.to_html(index=False, classes="custom-table")
     
     # Display styled table as HTML in Streamlit
     st.markdown(table_html, unsafe_allow_html=True)
-
-
 
 
